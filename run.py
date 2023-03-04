@@ -37,16 +37,36 @@ def index():
 @app.route('/tarea')
 def getTarea():
     cursor = mysql.connection.cursor()
-    cursor.execute('select id,descripcion,estado from tarea')
+    cursor.execute("select id,descripcion,estado from tarea")
     data = cursor.fetchall()
     print(data)
     cursor.close()
-
+    
     context = {
-        'status': True,
+        'status':True,
         'content':data
     }
+    
+    return jsonify(context)
 
+@app.route('/tarea',methods=['POST'])
+def setTarea():
+    descripcion = request.json['descripcion']
+    
+    cursor = mysql.connection.cursor()
+    cursor.execute("""
+                   insert into tarea(descripcion)
+                   values('"""+ descripcion +"""');
+                   """)
+    mysql.connection.commit()
+    cursor.close()
+    
+    context = {
+        'status':True,
+        'content':'',
+        'message':'registro exitoso'
+    }
+    
     return jsonify(context)
 
 if __name__ == '__main__':
