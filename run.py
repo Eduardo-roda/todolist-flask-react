@@ -69,5 +69,60 @@ def setTarea():
     
     return jsonify(context)
 
+@app.route('/tarea/<id>')
+def getTareaById(id):
+    cursor = mysql.connection.cursor()
+    cursor.execute("select id,descripcion,estado from tarea where id='"+id+"'")
+    data = cursor.fetchall()
+    cursor.close()
+    
+    context = {
+        'status':True,
+        'content':data
+    }
+    return jsonify(context)
+
+@app.route('/tarea/<id>',methods=['PUT'])
+def updateTareaById(id):
+    descripcion = request.json['descripcion']
+    estado = request.json['estado']
+    
+    cursor = mysql.connection.cursor()
+    cursor.execute("""
+                   update tarea set
+                   descripcion = '"""+descripcion+"""',
+                   estado = '"""+estado+"""'
+                   where id = '"""+id+"""'
+                   """)
+    mysql.connection.commit()
+    cursor.close()
+    
+    context = {
+        'status':True,
+        'content':'',
+        'message':'registro actualizado'
+    }
+    
+    return jsonify(context)
+
+@app.route('/tarea/<id>',methods=['DELETE'])
+def deleteTareaById(id):
+    cursor = mysql.connection.cursor()
+    cursor.execute("""
+                   delete from tarea
+                   where id = '"""+id+"""'
+                   """)
+    mysql.connection.commit()
+    cursor.close()
+    
+    context = {
+        'status':True,
+        'content':'',
+        'message':'registro eliminado'
+    }
+    
+    return jsonify(context)
+    
+
 if __name__ == '__main__':
     app.run(debug=True)
